@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<div id="app">
+    <label for="">请输入密码</label><input type="text" v-model="message">　<br>
+    <textarea name="content" id="" cols="100" rows="30" calss="ckeditor"></textarea>
+
+
+</div>
+
+<body>
+
+</body>
+</html>
+<script src="./plugins/ckeditor/static/ckeditor/ckeditor/ckeditor.js"></script>
+
+<script src=""></script>
+ <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+  <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+<script>
+    var vm = new Vue({
+        el:"#app",
+        data:{
+            message:"18"
+
+        },
+        mounted:function () {
+
+          CKEDITOR.replace("content")
+        }
+    })
+</script>

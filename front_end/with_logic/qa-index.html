@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --> 
+  <meta name="description" content="" /> 
+  <meta name="author" content="" /> 
+  <link rel="icon" href="./img/asset-favicon.ico" /> 
+  <title>社交-问答</title> 
+  <!-- 页面 css js --> 
+  <!-- <script type="text/javascript" src="../../plugins/sui/sui.min.js"></script> --> 
+  <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-base.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/page-sj-qa-login.css" />
+  <link rel="stylesheet" type="text/css" href="./css/page-sj-qa-logined.css" />
+
+  <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+  <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+  <script src="./plugins/jquery/dist/jquery.min.js"></script>
+ </head>
+ <body> 
+  <div class="wrapper"> 
+   <!--引用组件--> 
+   <!--头部导航--> 
+   <header> 
+    <div class="sui-navbar"> 
+
+    </div>
+   </header> 
+  </div> 
+  <div class="tab-nav "> 
+   <div class="wrapper" id="qa_categories">
+    <ul class="fl sui-nav nav-tabs navbar-dark" >
+     <!--<li class="active"><a href="javascript:;" data-toggle="tab">首页</a></li>-->
+     <li v-for="(category, index) in categories" :class="activeClass == index?'active':''" ><a :href="'qa-tagDetail.html?c_id='+category.id"  data-toggle="tab">{{category.name}}</a></li>
+    </ul>
+    <div class="clearfix"></div> 
+   </div> 
+  </div> 
+  <!--两列布局--> 
+  <div class="wrapper  qa-content" >
+   <div class="fl  left-list" id="qa_list">
+    <div class="tab-content"> 
+     <div id="index" class="tab-pane active"> 
+      <div class="tab-bottom-line"> 
+       <ul class="sui-nav nav-tabs" >
+        <li :class="new_"><a href="javascript:;" data-toggle="tab" @click="get_question_list('-create_time','','0');check_active('new')">最新提问</a></li>
+        <li :class="hot"><a href="javascript:;" @click="get_question_list('-click_count','','0');check_active('hot')" data-toggle="tab" >热门提问</a></li>
+        <li :class="wait"><a href="javascript:;" data-toggle="tab" @click="get_question_list('-create_time','wait','0');check_active('wait')">等待回答</a></li>
+       </ul>
+       <div class="qa-list">
+        <div class="tab-content"> 
+         <div id="new" class="tab-pane active" >
+          <ul class="detail-list"> 
+           <li class="qa-item" v-for="question in questions">
+            <div class="fl record"> 
+             <div class="number"> 
+              <div class="border useful"> 
+               <p class="usenum">{{question.useful_count}}</p>
+               <p>有用</p> 
+              </div> 
+              <div class="border answer"> 
+               <p class="ansnum">{{question.answers_count}}</p>
+               <p>回答</p> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="fl info"> 
+             <div class="question" >
+              <p class="author" v-show="question.answers_count"><span class="name">luckness</span><span>3</span>分钟前回答</p>
+              <p class="title"><a :href=" './qa-detail.html?id='+question.id" target="_blank">{{question.title}}</a></p>
+             </div> 
+             <div class="other">
+              <div class="fr brower"> 
+               <p>浏览量 {{question.click_count}} | {{question.create_time | str2date | date2ymd}}  {{question.create_time | str2date | date2hm}}来自 <span style="color: blue">{{question.author.nickname}}</span></p>
+              </div> 
+             </div> 
+            </div> 
+            <div class="clearfix"></div> </li> 
+
+          </ul> 
+          <div class="sui-pagination">
+            <a v-show="previous" @click="on_page(previous)">上一页</a>
+            <a v-for="num in page_nums" @click="on_page(num)" :class="num==page?'active':''">{{num}}</a>
+            <a v-show="next" @click="on_page(next)">下一页></a>
+          </div> 
+         </div> 
+         <div id="hot" class="tab-pane"> 
+          <p>热门回答</p> 
+         </div> 
+         <div id="wait" class="tab-pane"> 
+          <p>等待回答</p> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div id="php" class="tab-pane">
+       php 
+     </div> 
+     <div id="js" class="tab-pane">
+       Javascript 
+     </div> 
+     <div id="python" class="tab-pane">
+       python 
+     </div> 
+     <div id="java" class="tab-pane">
+       java 
+     </div> 
+    </div> 
+   </div>
+   <div class="fl  right-tag" id="login_check">
+    <div v-if="is_login">
+     <div class="block-btn" >
+      <p>今天，有什么好东西要和大家分享么?</p>
+     <a class="sui-btn btn-block btn-share" href="./qa-submit.html" target="_blank">发布问题</a>
+    </div>
+        <div class="hot-tags">
+     <div class="head">
+      <h3 class="title">热门标签</h3>
+     </div>
+     <div class="tags">
+      <ul class="sui-tag">
+       <li v-for="categorie in categories"><a :href="'qa-tagDetail.html?c_id=' + categorie.id"> {{categorie.name}}</a></li>
+      </ul>
+     </div>
+    </div>
+     </div>
+    <div class="qa-login" v-else>
+     <p>猿圈儿问答社区 帮助他人手留余香</p>
+     <form action="" class="sui-form" @submit.prevent='login'>
+      <div class="control-group">
+       <label for="inputaccount"  class="control-label">手机号或Email</label>
+       <div class="controls">
+        <input type="text" v-model="username"  @blur="check_username" data-rules="required" placeholder="11位手机号 或 Email" />
+        <span v-show="error_username" class="error_tip" style="color: red">请输入用户名或者手机号</span>
+       </div>
+      </div>
+      <div class="control-group">
+       <label for="inputaccount" class="control-label"> <span class="fl">密码</span> </label>
+
+       <div class="controls">
+        <input type="password" v-model="password" placeholder="不少于6位" />
+        <span v-show="error_pwd" class="error_tip" style="color: red">{{ error_pwd_message }}</span>
+       </div>
+      </div>
+      <div class="control-group">
+       <label for="" class="fl radio-circle checked"> <input type="radio" checked="checked" name="radio1" /><span>记住登录状态</span> </label>
+       <div class="fqir controls">
+        <button type="submit"  class="sui-btn btn-login"  style="float: right">登 录</button>
+       </div>
+       <div class="clearfix"></div>
+      </div>
+     </form>
+     <p>还没账号？立即<a :href="'./person-loginsign.html?next='+ url" target="_blank">注册</a></p>
+    </div>
+   </div>
+
+  </div>
+  <div class="footer">
+
+  </div>
+ </body>
+</html>
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/qa-index.js"></script>

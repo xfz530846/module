@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./img/asset-favicon.ico">
+    <title>社交-问答详情</title>
+
+    <!-- 页面 css js -->
+    <!-- <script type="text/javascript" src="../../plugins/sui/sui.min.js"></script> -->
+
+    <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="./css/widget-base.css" />
+    <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" />
+    <link rel="stylesheet" type="text/css" href="./css/page-sj-headline-detail.css" />
+    <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+    <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <!--引用组件-->
+        <!--头部导航-->
+<header>
+  <div class="sui-navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="sui-brand"><img src="./img/asset-logo-black.png" alt="社交" /></a>
+      <ul class="sui-nav">
+       <li class="active"><a href="./index.html">头条</a></li>
+       <li><a href="./qa-index.html">问答</a></li>
+       <li><a href="./activity-index.html">活动</a></li>
+       <li><a href="./talk-index.html">吐槽</a></li>
+      </ul>
+      <form class="sui-form sui-form pull-left">
+        <input type="text" placeholder="输入关键词...">
+        <span class="btn-search fa fa-search"></span>
+      </form>
+      <div id="user_info" >
+	<div class="sui-nav pull-right info" v-if="user">
+		<li><a href="#" target="_blank"><img :src="user.avatar_url" style="height: 30px;width: 30px"></a></li>
+		<li><a href="#" target="_blank" >{{user.nickname}}</a></li>
+		<li><a href="#" @click="logout()"  class="sui-btn btn-login">登出</a></li>
+	</div>
+	<div class="sui-nav pull-right info" v-else>
+		<li><a href="./person-loginsign.html" >注册</a></li>
+		<li><a href="./person-loginsign.html"  class="sui-btn btn-login">登录</a></li>
+	</div>
+</div>
+  </div>
+  </div>
+  
+</header>
+    
+
+    </div>
+    <!--两列布局-->
+    <div class="wrapper headline-content"  id="detail">
+        <div class="fl left-list">
+            <div class="problem-detail">
+    <!-- title area  -->
+    <div class="title-intro" >
+        <h2>{{ headlines_detail.title }}</h2>
+        <div class="operate">
+            <span class="fl author">{{ headlines_detail.author.nickname }}<span class="time">{{ headlines_detail.create_time | str2date | date2ymd }}</span></span>
+            <span class="fr " v-if="collection_status == 0"><a href="javascript:;" @click="collect()">收藏</a></span >
+            <span class="fr " v-else><a href="javascript:;" @click="uncollect()">取消收藏</a></span >
+        </div>
+        <div class="clearfix"></div>
+        <div class="content" v-html="headlines_detail.content">
+
+        </div>
+    </div>
+    <!-- remark area -->
+    <div class="answer-intro">
+        <h4 class="answer-num">{{ headlines_detail.comment_counts }}条评论</h4>
+        <div class="comment-box">
+            <form class="comment-form sui-form form-inline" v-if="token" @submit.prevent="onSubmit()">
+                <img :src="user.avatar_url" alt="">
+                <div class="input-prepend input-append input-box">
+                    <input id="appendedPrependedInput" type="text" class="span2 input-fat real-box" placeholder="写下你的评论" v-model="content"><span class="add-on" @click="headline_comment()">提交</span>
+                </div>
+            </form>
+            <div class="comment_form_logout" @click="login" v-else>
+                登录发表你的评论
+            </div>
+        </div>
+        <div class="remark-list" id="comment">
+            <ul class="lists" >
+               <li class="item" v-for="(comment, index) in comments_detail">
+                    <div class="fl img">
+                        <img :src="comment.user.avatar_url" alt="">
+                    </div>
+                    <div class="fl text">
+                        <p class="author"><span class="name">{{ comment.user.nickname }}</span> 发布</p>
+                        <p class="word">{{ comment.content }}</p>
+                        <p class="tool"><a class="callback" @click="show_reply(index)">回复</a>&nbsp;<span class="remark-num">{{ comment.child_counts }}条回复</span></p>
+                    </div>
+                    <div style="clear:both"></div>
+                    <div class="edit-box" v-if="index==current">
+                        <form class="comment-form" @submit.prevent="onSubmit()">
+                            <textarea row="1" placeholder="使用评论询问更多信息或提出修改意见，请不要在评论里回答问题" v-model="reply_content"></textarea>
+                            <button type="submit" class="sui-btn submit-comment" @click="reply_comment(comment.id, index)">提交评论</button>
+                        </form>
+                    </div>
+                    <ul class="inner-list">
+                        <li class="item"  v-if="comment.child_comments">
+                            <div class="fl img">
+                                <img :src="comment.child_comments.user.avatar_url" alt="">
+                            </div>
+                            <div class="fl text">
+                                <p class="author"><span class="name">{{ comment.child_comments.user.nickname }}</span> 发布</p>
+                                <p class="word">{{ comment.child_comments.content }}</p>
+                                <!--<p class="tool"><a class="callback" ></a>&nbsp;<span class="remark-num"></span></p>-->
+                            </div>
+                </li>
+            </ul>
+                   <!--旧版本-->
+                    <!--<ul class="inner-list"  v-for="(sub_comment,index) in comment.comments_set " v-if="index == 0">-->
+                        <!--<li class="item"  >-->
+                            <!--<div class="fl img">-->
+                                <!--<img :src="sub_comment.user.avatar_url" alt="">-->
+                            <!--</div>-->
+                            <!--<div class="fl text">-->
+                                <!--<p class="author"><span class="name">{{ sub_comment.user.nickname }}</span> 发布</p>-->
+                                <!--<p class="word">{{ sub_comment.content }}</p>-->
+                                <!--&lt;!&ndash;<p class="tool"><a class="callback" ></a>&nbsp;<span class="remark-num"></span></p>&ndash;&gt;-->
+                            <!--</div>-->
+                    <!---->
+                <!--</li>-->
+            <!--</ul>-->
+        </li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+        </div>
+        <div class="fl right-tag">
+<div class="focus similar-problem" id="headlines_followed">
+    <div class="img-title">
+        <div class="fl img">
+            <img :src="headlines_detail.author.avatar_url" alt="">
+        </div>
+        <div class="fl btn-focus">
+            <h4>{{ headlines_detail.author.nickname }}</h4>
+            <button class="sui-btn btn-info btn-attention" v-if="attention_status == 0" @click="attention()">关注</button>
+            <button class="sui-btn btn-info btn-attention" v-else @click="unattention()">取消关注</button>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <ul class="problem-list">
+        <li class="list-item" v-for="(headline,index) in headlines_detail.author.headlines">
+            <p class="list-title" @click="target(headline.id, headline.category)"><a href="javascript:;" style="color: black">{{ headline.title }}</a></p>
+        </li>
+    </ul>
+</div>
+<div class="similar-problem">
+    <h3 class="title">热门推荐</h3>
+    <ul class="problem-list">
+        <li class="list-item" v-for="headline in hot_headlines">
+            <p class="list-title" @click="target(headline.id, headline.category)"><a href="javascript:;" style="color: black">{{ headline.title }}</a></p>
+        </li>
+    </ul>
+</div>
+<div class="similar-problem">
+    <h3 class="title">热门吐槽</h3>
+    <ul class="problem-list">
+        <li class="list-item" v-for="talk in hot_talks">
+            <a :href="'/talk-detail.html?talk_id=' + talk.id" style="color: black"><p class="list-title">{{ talk.detail }}</p></a>
+        </li>
+    </ul>
+</div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="footer">
+        <div class="wrapper">
+            <div class="footer-bottom">
+    <div class="link">
+        <dl>
+            <dt>网站相关</dt>
+            <dd>关于我们</dd>
+            <dd>服务条款</dd>
+            <dd>帮助中心</dd>
+            <dd>编辑器语法</dd>
+        </dl>
+        <dl>
+            <dt>常用链接</dt>
+            <dd>传智播客</dd>
+            <dd>传智论坛</dd>
+        </dl>
+        <dl>
+            <dt>联系我们</dt>
+            <dd>联系我们</dd>
+            <dd>加入我们</dd>
+            <dd>建议反馈</dd>
+        </dl>
+        <dl>
+            <dt>关注我们</dt>
+            <dd>微博</dd>
+            <dd>twitter</dd>
+        </dl>
+
+        <div class="xuke">
+            <h3>内容许可</h3>
+            <p>除特别说明外，用户内容均采用知识共享署名-非商业性使用-禁止演绎4.0 国际许可协议 (CC BY-NC-ND 4.0) 进行许可</p>
+            <p>本站由 传智研究院 提供更新服务</p>
+        </div>
+    </div>
+
+
+    <p class="Copyright">Copyright © 2017 传智问答社区 当前版本 0.0.1</p>
+</div>
+        </div>
+
+    </div>
+
+
+
+
+
+<script>
+// $(function(){
+//   $(".hover").hover(function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "show"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#e64620");
+//   },function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "hide"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#000");
+//   })
+// })
+
+
+    // $(function () {
+    //     $(".callback").click(function () {
+    //         $(this).parents(".text").siblings(".edit-box").toggle();
+    //     });
+    // })
+    // }
+
+
+
+
+    // var onOff = true;
+    // $(".btn-attention").click(function () {
+    //     if ($(this).onOff) {
+    //         $(this).text("关注");
+    //         $(this).css({"color":"#e64620","cursor":"not-allowed","background":"#f5f5f5","border-color": "#f5f5f5f5"})
+    //         $(this).onOff = false;
+    //     } else {
+    //         $(this).text("已关注");
+    //         $(this).css("color", "#999");
+    //         $(this).onOff = true;
+    //     }
+    // })
+</script>
+</body>
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/headline-detail.js"></script>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./img/asset-favicon.ico">
+    <title>社交-问答详情</title>
+
+    <!-- 页面 css js -->
+    <!-- <script type="text/javascript" src="../../plugins/sui/sui.min.js"></script> -->
+
+    <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="./css/widget-base.css" />
+    <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" />
+    <link rel="stylesheet" type="text/css" href="./css/page-sj-qa-detail.css" />
+    <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+    <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+    <script src="./plugins/jquery/dist/jquery.min.js"></script>
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <!--引用组件-->
+        <!--头部导航-->
+<header>
+  <div class="sui-navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="sui-brand"><img src="./img/asset-logo-black.png" alt="社交" /></a>
+        <ul class="sui-nav">
+           <li class="active"><a href="./index.html">头条</a></li>
+           <li><a href="./qa-index.html">问答</a></li>
+           <li><a href="./activity-index.html">活动</a></li>
+           <li><a href="./talk-index.html">吐槽</a></li>
+        </ul>
+      <form class="sui-form sui-form pull-left">
+        <input type="text" placeholder="输入关键词...">
+        <span class="btn-search fa fa-search"></span>
+      </form>
+      <div id="user_info" >
+	<div class="sui-nav pull-right info" v-if="user">
+		<li><a href="javascript:;" target="_blank"><img :src="user.avatar_url" style="height: 30px;width: 30px"></a></li>
+		<li><a href="javascript:;" target="_blank" >{{user.nickname}}</a></li>
+		<li><a href="javascript:;" @click="logout()"  class="sui-btn btn-login">登出</a></li>
+	</div>
+	<div class="sui-nav pull-right info" v-else>
+		<li><a href="./person-loginsign.html" >注册</a></li>
+		<li><a href="./person-loginsign.html"  class="sui-btn btn-login">登录</a></li>
+	</div>
+</div><a href="./person-homepage.html" target="_blank" class="homego"><img src="./img/widget-photo.png" alt="用户头像"></a></li>
+      </div>
+  </div>
+</header>
+  </div>
+
+
+    <div class="tab-nav ">
+    <div class="wrapper">
+        <ul class="fl sui-nav nav-tabs navbar-dark" id="qa_categories">
+            <li v-for="(categorie,index) in categories" :class="activeClass == index?'active':''"><a :href="'./qa-tagDetail.html?c_id='+categorie.id" cdata-toggle="tab">{{categorie.name}}</a></li>
+        </ul>
+        <span class="fr more"><a href="./qa-allTag.html" target="_blank">更多</a></span>
+        <div class="clearfix"></div>
+    </div>
+
+</div>
+    <!--两列布局-->
+    <div class="wrapper qa-content" id="qa_detail" >
+        
+<div class="qa-title" >
+    <div class="fl title">
+       <h2>{{question_detail.title}}</h2>
+       <p>
+           <span class="tag">{{question_detail.label.name}}</span>
+           <span class="author">{{question_detail.author.nickname}}</span>
+           <span>2小时前提问</span>
+       </p>
+    </div>
+    <div class="fr share">
+    </div>
+    <div class="clearfix"></div>
+</div>
+        <div class="fl left-list">
+            <div class="problem-detail">
+    <div class="title-intro">
+
+        <div class="sidebar">
+
+            <button v-if="question_detail.useful_status == 0" @click="question_useful()" type="button" class="like" data-placement="right" data-toggle="tooltip" title="问题对人有帮助，内容完整，我也想知道答案"><i class="fa fa-caret-up" aria-hidden="true"></i></button>
+
+            <span class="count">{{ question_detail.useful_count }}</span>
+            <button v-if="question_detail.useful_status != 0" @click="question_unuseful()" type="button" class="hate" data-placement="right" data-toggle="tooltip" title="问题没有实际价值，缺少关键内容，没有改进余地"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+
+        </div>
+        <div class="title">
+            <div class="detail" v-html="question_detail.detail">
+            </div>
+            <div class="clearfix"></div>
+            <div class="operate">
+                <span class="time">1小时前提问</span>
+                <span class="comment" @click="show_question_comment_box">回答</span>
+            </div>
+            <div class="comment-box" v-if="show">
+                <form class="comment-form" @submit.prevent="onSubmit()">
+                    <textarea row="1" v-model="user_answer" placeholder="使用评论询问更多信息或提出修改意见，请不要在评论里回答问题"></textarea>
+                    <button type="submit" class="sui-btn submit-comment" @click="submit_answer()" >提交回答</button>
+                </form>
+                <div class="tips">
+                    <p>评论支持部分 Markdown 语法：**bold**_italic_[link](http://example.com)> 引用`code`- 列表。 同时，被你 @ 的用户也会收到通知</p>
+                </div>
+            </div>
+        </div>
+            </div>
+
+
+    <div class="answer-intro">
+        <h4 class="answer-num">{{ question_detail.answers_count }}个回答</h4>
+        <ul>
+        <li v-for="(answer, index) in answers">
+
+        <div class="sidebar">
+            <button v-if="answer.useful_status == 0" @click="answer_useful(answer.id, index)" type="button" class="like" data-placement="right" data-toggle="tooltip" title="问题对人有帮助，内容完整，我也想知道答案"><i class="fa fa-caret-up" aria-hidden="true"></i></button>
+
+            <span class="count">{{ answer.useful_count }}</span>
+             <button v-if="answer.useful_status != 0" @click="answer_unuseful(answer.id, index)" class="hate" data-placement="right" data-toggle="tooltip" title="问题没有实际价值，缺少关键内容，没有改进余地"><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+        </div>
+        <div class="title">
+            <p>{{ answer.content }}</p>
+
+            <div class="operate">
+                <div class="tool pull-left">
+                    <span class="time">1小时前回答</span>
+                    <span class="comment" @click="show_answer_comment(index)">评论</span>
+                </div>
+
+                <div class="myanswer pull-right">
+                    <img src="./img/widget-photo.jpg" alt=""> <a href="#">我的回答</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="comment-box" v-if="index == current_index">
+                <form class="comment-form" @submit.prevent="onSubmit()">
+                    <textarea row="1" placeholder="使用评论询问更多信息或提出修改意见，请不要在评论里回答问题" v-model="user_comment"></textarea>
+                    <button type="submit" class="sui-btn submit-comment" @click="submit_comment(answer.id)">提交评论</button>
+                </form>
+                <div class="tips">
+                    <p>评论支持部分 Markdown 语法：**bold**_italic_[link](http://example.com)> 引用`code`- 列表。 同时，被你 @ 的用户也会收到通知</p>
+
+            </div>
+
+        </div>
+        <div class="clearfix"></div>
+
+        </div>
+        <div class="clearfix"></div>
+
+        </li>
+        </ul>
+    </div>
+    <div class="edit-answer">
+        <h4>撰写答案</h4>
+        <div class="edit-tip">
+            <h4>你正在撰写答案</h4>
+            <p>如果你是要对问题或其他回答进行点评或询问，请使用“评论”功能。</p>
+        </div>
+    </div>
+ </div>
+        </div>
+
+<!-- <script>
+    $(function () {
+        $(".comment").click(function () {
+            $(this).parents(".operate").siblings(".comment-box").toggle();
+        });
+        $(".sidebar .fa").hover(function () {
+            $(this).css("color", "#e64620");
+        }, function () {
+            $(this).css("color", "#000");
+        })
+    })
+
+</script> -->
+
+        <div class="fl right-tag">
+
+            <div class="similar-problem">
+    <h3 class="title">相似问题</h3>
+    <ul class="problem-list">
+        <li class="list-item">
+            <p class="list-title">求一份浏览器中html css javascript jquery ajax的渲染顺序与原理！！</p>
+            <p class="list-info"><a href="">1 回答</a> | 已解决</p>
+        </li>
+        <li class="list-item">
+            <p class="list-title">求一份浏览器中html css javascript jquery ajax的渲染顺序与原理！！</p>
+            <p class="list-info"><a href="">1 回答</a> | 已解决</p>
+        </li>
+         <li class="list-item">
+            <p class="list-title">求一份浏览器中html css javascript jquery ajax的渲染顺序与原理！！</p>
+            <p class="list-info"><a href="">1 回答</a> | 已解决</p>
+        </li>
+         <li class="list-item">
+            <p class="list-title">求一份浏览器中html css javascript jquery ajax的渲染顺序与原理！！</p>
+            <p class="list-info"><a href="">1 回答</a> | 已解决</p>
+        </li>
+    </ul>
+</div>
+</div>
+        <div class="clearfix"></div>
+</div>
+
+    <div class="footer">
+        <div class="wrapper">
+            <div class="footer-bottom">
+    <div class="link">
+        <dl>
+            <dt>网站相关</dt>
+            <dd>关于我们</dd>
+            <dd>服务条款</dd>
+            <dd>帮助中心</dd>
+            <dd>编辑器语法</dd>
+        </dl>
+        <dl>
+            <dt>常用链接</dt>
+            <dd>传智播客</dd>
+            <dd>传智论坛</dd>
+        </dl>
+        <dl>
+            <dt>联系我们</dt>
+            <dd>联系我们</dd>
+            <dd>加入我们</dd>
+            <dd>建议反馈</dd>
+        </dl>
+        <dl>
+            <dt>关注我们</dt>
+            <dd>微博</dd>
+            <dd>twitter</dd>
+        </dl>
+
+        <div class="xuke">
+            <h3>内容许可</h3>
+            <p>除特别说明外，用户内容均采用知识共享署名-非商业性使用-禁止演绎4.0 国际许可协议 (CC BY-NC-ND 4.0) 进行许可</p>
+            <p>本站由 传智研究院 提供更新服务</p>
+        </div>
+    </div>
+
+
+    <p class="Copyright">Copyright © 2017 传智问答社区 当前版本 0.0.1</p>
+</div>
+        </div>
+
+    </div>
+
+
+
+
+
+<script>
+// $(function(){
+//   $(".hover").hover(function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "show"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#e64620");
+//   },function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "hide"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#000");
+//   })
+// })
+</script>
+</body>
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/qa-detail.js"></script>

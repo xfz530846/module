@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./img/asset-favicon.ico">
+    <title>社交-提交头条</title>
+
+    <!-- 页面 css js -->
+    <!-- <script type="text/javascript" src="../../plugins/sui/sui.min.js"></script> -->
+
+    <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" />
+    <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="./css/widget-base.css" />
+    <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" />
+    <link rel="stylesheet" type="text/css" href="./css/page-sj-headline-submit.css" />
+    <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+    <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+    <script src="./plugins/jquery/dist/jquery.min.js"></script>
+    <script src="plugins/ckeditor/static/ckeditor/ckeditor/ckeditor.js"></script>
+    <!--<script type="text/javascript" src="http://127.0.0.1:8000/static/ckeditor/ckeditor/ckeditor.js"></script>-->
+
+</head>
+
+<body>
+    <div class="wrapper">
+        <!--引用组件-->
+        <!--头部导航-->
+<header>
+  <div class="sui-navbar">
+  </div>
+  
+</header>
+    
+
+    </div>
+    <!--<div class="tab-nav ">-->
+    <!--<div class="wrapper">-->
+        <!--<ul class="fl sui-nav nav-tabs navbar-dark">-->
+            <!--<li class="active"><a href="#index" data-toggle="tab">首页</a></li>-->
+            <!--<li><a href="#php" data-toggle="tab">Php</a></li>-->
+            <!--<li><a href="#js" data-toggle="tab">Javascript </a></li>-->
+            <!--<li><a href="#python" data-toggle="tab">Python</a></li>-->
+            <!--<li><a href="#java" data-toggle="tab">Java</a></li>-->
+        <!--</ul>-->
+        <!--<span class="fr more"><a href="./qa-allTag.html" target="_blank">更多</a></span>-->
+        <!--<div class="clearfix"></div>-->
+    <!--</div>-->
+
+</div>
+    <!--两列布局-->
+    <div class="wrapper">
+        <div class="submit-headline">
+    <div class="left-box">
+        <h3 class="tit">
+            <span>发布头条</span>
+        </h3>
+        <form class="sui-form form-horizontal" id="pub_headline" @submit.prevent="onSubmit">
+            <div class="control-group">
+                <div class="controls title-input">
+                    <input type="text" id="inputEmail" v-model="title" placeholder="标题：不超过30个字符">
+                </div>
+            </div>
+            <div class="control-group select">
+                <select v-model="category_id" style="margin-left: 8px">
+                    <option disabled value="" selected>头条类别</option>
+                    <option v-for="category in categories" :value="category.id">{{ category.name }}</option>
+                </select>
+            </div>
+            <div class="tags-area">
+                    <label>标签：</label>
+                    <span v-for="tag in labels" >
+                       <input type="checkbox"  name="label" v-model="checkedLabels" class="input-xfat input-xxlarge" :value="tag.id" />{{ tag.name }}
+                    </span>
+                <div class="tags-box">
+                    <ul class="sui-tag tag-bordered">
+                        <li class="tag-item">javascript</li>
+                        <li class="tag-item">php</li>
+                        <li class="tag-item">css</li>
+                        <li class="tag-item">html</li>
+                        <li class="tag-item">java</li>
+                        <li class="tag-item">python</li>
+                        <li class="tag-item">html5</li>
+                        <li class="tag-item">node.js</li>
+                        <li class="tag-item">c++</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--<textarea class="ckeditor" id="textarea" name="financial.bz"></textarea>-->
+            <div class="editor">
+                <textarea name="financial" ></textarea>
+            </div>
+            <div class="submit">
+                <button type="submit" class="sui-btn btn-xlarge  btn-success" @click="submit_headline()">提交</button>
+            </div>
+        </form>
+    </div>
+    <div class="right-tips">
+        <h3>发帖指南</h3>
+        <ul>
+            <li>独立思考、自由探索</li>
+            <li>发布的内容和互联网、编程开发、产品设计有关</li>
+            <li>标题能准确描述的内容，不要发重复的内容</li>
+            <li>客观投票，确保你看过这篇内容</li>
+            <li>如果你遇到了具体的编程难题，请到 问答平台 提问</li>
+            <li>保持友善，禁止任何形式的广告、SEO 推广</li>
+            <li>遵循 用户服务条款</li>
+        </ul>
+    </div>
+</div>
+<!-- <script>
+    $(function () {
+        $("#tags").focus(function () {
+            $(".tags-box").css("display", "block");
+            $(".tag-item").click(function () {
+                var text = $(this).text();
+                $("#tags").before("<span class='tags-detail with-x'>" + text + "<i>×</i></span>");
+                $(this).css('width', $('.tags-detail').width()+'px');
+                $(".tags-detail").click(function () {
+                    $(this).remove();
+                })
+            });
+        });
+
+    })
+</script>
+<script type="text/javascript">
+    $(document).click(function () {
+        $(".tags-box").hide();
+    });
+    $(".tags-area").click(function (event) {
+        event.stopPropagation();
+    });
+</script> -->
+    </div>
+    <div class="footer">
+
+    </div>
+
+<script>
+// $(function(){
+//   $(".hover").hover(function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "show"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#e64620");
+//   },function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "hide"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#000");
+//   })
+// })
+</script>
+
+
+</body>
+<!--<script>-->
+    <!--window.onload = function()-->
+    <!--{-->
+        <!--// CKEDITOR.replace('financial');-->
+        <!--// console.log(CKEDITOR.replace('financial').getData())-->
+    <!--};-->
+    <!--</script>-->
+    <!--CKEDITOR.replace('financial.bz');</script>-->
+<script type="text/javascript" src="js/base.js"></script>
+<script type="text/javascript" src="js/center_check.js"></script>
+<script type="text/javascript" src="js/headline-submit.js"></script>

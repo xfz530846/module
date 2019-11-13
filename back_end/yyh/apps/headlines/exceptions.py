@@ -1,0 +1,3 @@
+
+class IllegalException(Exception):
+    pass

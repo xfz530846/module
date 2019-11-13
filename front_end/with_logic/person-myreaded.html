@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --> 
+  <meta name="description" content="" /> 
+  <meta name="author" content="" /> 
+  <link rel="icon" href="./img/asset-favicon.ico" /> 
+  <title>社交-浏览记录</title> 
+  <!-- 页面 css js --> 
+  <!-- <script type="text/javascript" src="../../plugins/sui/sui.min.js"></script> --> 
+  <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-base.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/page-sj-person-myreaded.css" />
+
+  <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+  <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+  <script src="./plugins/jquery/dist/jquery.min.js"></script>
+
+ </head> 
+ <body> 
+  <div class="wrapper"> 
+   <!--引用组件--> 
+   <!--头部导航--> 
+   <header> 
+    <div class="sui-navbar">
+    </div> 
+   </header> 
+  </div> 
+ 
+  <div class="myhome-personinfo" id="user_center_archives" style="background-color:#AEDD81">
+  </div> 
+  <!-- <script>
+    $(function(){
+        $(".share .fa").hover(function(){
+            $(this).css("opacity","1.0");
+        },function(){
+            $(this).css("opacity","0.6") 
+        })
+    })
+</script>
+<script>
+$(function(){
+    // 个人简介
+    $(".addedit").click(function(){
+        var editBox = $(".edit-intro");
+        var editBoxtxt = editBox.text();
+        var input = $("<div><textarea class='editarea' type='text' /><div class='btns'><button class='sui-btn btn-default btn-cancel'>取消</button><button class='sui-btn btn-info btn-save'>保存</button></div></div>"); 
+        editBox.html(input);
+
+        // 点击保存
+        $(".edit-intro .btn-save").click(function(){       
+            var newval = $(".editarea").val();
+            if(newval == ""){
+              editBox.html("暂时没有个人简介")
+            }else if($.trim(newval) != $.trim(editBoxtxt)){
+               editBox.html(newval);
+            }
+        })
+        //点击取消
+        $(".edit-intro .btn-cancel").click(function(){       
+          editBox.html("暂时没有个人简介")
+        })
+
+    });
+    $(".edit-item").click(function(){  
+        var txt = $(this).text();  //可变的值
+
+        var rightform = $(this).siblings(".sui-form");
+        var rightinput = $(this).siblings(".sui-form input").val(); // 输入的值
+
+        rightform.show();
+
+        // $(".save-btn").click(function(){
+        //     console.log(rightinput);
+        // })
+
+
+
+    })
+    
+
+})
+</script> --> 
+  <!--两列布局--> 
+  <div class="wrapper  myhome"> 
+   <div class="left-list"> 
+    <div class="myhome-list"> 
+     <ul class="home-list"> 
+      <li class="active"><a href="./person-homepage.html">我的主页</a></li> 
+      <li><a href="./person-myanswer.html">我的回答</a></li> 
+      <li><a href="./person-myquestion.html">我的提问</a></li> 
+      <li><a href="./person-myshare.html">我的分享</a></li> 
+     </ul> 
+     <ul class="home-list bottom"> 
+      <li><a href="./person-dynamic.html">个人动态</a></li> 
+      <li><a href="./person-myfocus.html">我的关注</a></li> 
+      <li><a href="./person-mycollect.html">我的收藏</a></li> 
+      <li><a href="./person-myreaded.html">浏览记录</a></li> 
+      <li><a href="./person-account.html">账户设置</a></li> 
+     </ul> 
+    </div> 
+    <!-- <script>
+    $(function(){
+        $(".home-list li").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        })
+    })
+</script> --> 
+   </div> 
+   <div class="right-content"> 
+    <div class="activities"> 
+     <h4 class="tit"><span>浏览记录</span><span class="clear"><a href="javascript:;">清空记录</a></span></h4> 
+     <div class="notice-day"> 
+      <div class="everyday" id="my_brosing_history">
+       <ul class="operate"  v-for="headline in broswing_history">
+        <li><span class="time">{{headline.create_time | str2date |  date2ymd  }} {{headline.create_time | str2date |  date2hm  }}</span><a :href="'./headline-detail.html?id=' + headline.id">{{headline.headlines.title}}</a></li>
+       </ul> 
+      </div>
+      <div class="btn">
+      </div>
+     </div> 
+    </div> 
+   </div> 
+   <div class="clearfix"></div> 
+  </div> 
+  <div class="footer">
+  </div> 
+  <script>
+// $(function(){
+//   $(".hover").hover(function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "show"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#e64620");
+//   },function(){
+//     $(".hoverinfo").stop().animate({
+//        opacity: "hide"
+//     },"slow");
+//     $(this).find(".fa-plus").css("color","#000");
+//   })
+// })
+</script> 
+ </body>
+</html>
+
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/person-myreaded.js"></script>
+<script type="text/javascript" src = "js/center_check.js"></script>

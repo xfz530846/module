@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --> 
+  <meta name="description" content="" /> 
+  <meta name="author" content="" /> 
+  <link rel="icon" href="./img/asset-favicon.ico" /> 
+  <title>社交-吐槽</title> 
+  <!-- 页面 css js --> 
+  <!-- <script type="text/javascript" src="../../plugins/sui/sui.min.js"></script> --> 
+  <!-- <script type="text/javascript" src="../../plugins/bootstrap/dist/js/bootstrap.js"></script> --> 
+  <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-base.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/bootstrap/dist/css/bootstrap.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/page-sj-spit-detail.css" />
+
+  <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+  <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+  <script src="./plugins/jquery/dist/jquery.min.js"></script>
+
+ </head> 
+ <body> 
+  <div class="wrapper" >
+   <!--引用组件--> 
+   <!--头部导航--> 
+   <header> 
+    <div class="sui-navbar"> 
+
+    </div> 
+   </header> 
+   <!--引用组件--> 
+   <!--两列布局--> 
+   <div class="wrapper tc-detail"> 
+    <div class="fl left-list"> 
+     <div class="tc-detail" >
+      <!-- 标题区 --> 
+      <div class="detail-tit" id="talk_detail">
+       <div class="detail-author"> 
+        <a href="javascript:;">{{talk.user.nickname}}</a> 发布
+       </div> 
+       <div class="detail-content" v-html="talk.detail">
+{#        <p>{{talk.detail}}</p>#}
+        <img src="#" alt="" />
+       </div>
+          <div class="detail_img"><img src="#" alt="" /></div>
+       <div class="detail-tool"> 
+        <ul> 
+         <li><a href="javascript:;" @click="talklike()" class="zan" ><i :class="talk.is_like ? 'fa fa-thumbs-up' :'fa fa-thumbs-o-up'" aria-hidden="true"></i></a> {{talk.like_count}}</li>
+            <li><a href="javascript:;" @click="talkcollections()" class="star"><i aria-hidden="true" :class="talk.is_collect ? 'fa fa-star':'fa fa-star-o'"></i></a></li>
+         <!--<li><a href="#" data-toggle="modal" data-target="#shareModal"><i class="fa fa-share-alt" aria-hidden="true"></i> 44</a></li> -->
+         <li><a data-toggle="modal"  data-target="#remarkModal" @click="publish_comment()"><i class="fa fa-commenting" aria-hidden="true"></i> {{talk.comment_count}}</a></li>
+
+        </ul> 
+       </div> 
+      </div> 
+      <!-- 评论区 --> 
+      <div class="comment-area" id="talk_comments">
+       <div class="comment-tit"> 
+        <span>评论</span> 
+       </div> 
+       <ul class="comment-list"> 
+        <li v-for="(comment,index) in comments">
+
+         <div class="item-photo"> 
+          <img :src="comment.user.avatar_url" alt="" style="height: 30px;width: 30px" />
+         </div> 
+         <div class="item-content"> 
+          <p class="author"><a href="javascript:;">{{comment.user.nickname}}</a> 发布</p>
+          <p class="content">{{comment.content}}</p>
+         </div> 
+         <div class="item-thumb"> 
+          <div>
+           <a href="javascript:;" @click="comment_like(index);" class="zan" ><i :class="comment.is_like ? 'fa fa-thumbs-up' :'fa fa-thumbs-o-up'" aria-hidden="true"></i></a>{{comment.like_count}}
+          </div> 
+         </div> </li>
+<div class="comment-box" v-show="publish_comment_show"><form class="comment-form sui-form form-inline"><img alt="" :src="avatar_url"> <div class="input-prepend input-append input-box"><input id="appendedPrependedInput" v-model="talk_commment_message" type="text" placeholder="写下你的评论" class="span2 input-fat real-box" style="width: 600px;height: 30px;border-radius: 5px;float:left"><span class="add-on" @click="talk_comment()" style="width: 60px;height: 30px;float: right;border-radius:3px;">提交</span></div></form></div>       </ul>
+      </div>
+     </div> 
+    </div> 
+    <div class="fl right-tag"> 
+     <div class="block-btn"> 
+      <p>来个匿名吐槽，发泄一下你心中的怒火吧！</p> 
+      <a class="sui-btn btn-block btn-share" href="./talk-submit.html" target="_blank">发吐槽</a>
+     </div> 
+    </div> 
+    <div class="clearfix"></div> 
+   </div>
+  </div> 
+
+  <!--<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js"></script>-->
+  <!--<script type="text/javascript" charset="utf-8" src="http://v3.jiathis.com/code/jia.js"></script>-->
+ </body>
+</html>
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/talk-detail.js"></script>

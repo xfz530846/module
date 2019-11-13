@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="utf-8" /> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+  <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --> 
+  <meta name="description" content="" /> 
+  <meta name="author" content="" /> 
+  <link rel="icon" href="./img/asset-favicon.ico" /> 
+  <title>社交-吐槽</title> 
+  <!-- 页面 css js --> 
+  <link rel="stylesheet" type="text/css" href="./plugins/normalize-css/normalize.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/yui/cssgrids-min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/sui/sui-append.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/font-awesome/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-base.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/widget-head-foot.css" /> 
+  <link rel="stylesheet" type="text/css" href="./plugins/bootstrap/dist/css/bootstrap.min.css" /> 
+  <link rel="stylesheet" type="text/css" href="./css/page-sj-spit-index.css" />
+  <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+  <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+
+  <script src="./plugins/jquery/dist/jquery.min.js"></script>
+ </head>
+ <body> 
+  <div class="wrapper"> 
+   <!--引用组件--> 
+   <!--头部导航--> 
+   <header> 
+    <div class="sui-navbar"> 
+
+    </div> 
+   </header> 
+   <!--两列布局--> 
+   <div class="wrapper tag-item">
+    <div class="fl left-list"> 
+     <div class="tc-data-list"> 
+      <div class="tc-list" id="talk_list">
+       <ul class="detail-list" >
+        <li class="qa-item" v-for="(talk,index) in talks" >
+         <div class="fl record"> 
+          <div class="number"> 
+           <div class="border useful"> 
+            <p class="usenum"  ><a href="javascript:;" @click="talklike(index);" class="zan" ><i :class="talk.is_like ? 'fa fa-thumbs-up' :'fa fa-thumbs-o-up'" aria-hidden="true"></i></a></p>
+            <p class="zannum" id="count"> {{ talk.like_count }} </p>
+           </div> 
+           <div class="border answer"> 
+            <a href="javascript:;" class="star" @click="talkcollections(index);" ><i :class="talk.is_collect ? 'fa fa-star':'fa fa-star-o'" aria-hidden="true"></i></a>
+           </div> 
+          </div> 
+         </div> 
+         <div class="info">
+          <p class="text"> <a :href="'./talk-detail.html?talk_id=' + talk.id" target="_blank" v-html="talk.detail">  </a> </p>
+          <div class="other">
+           <div class="fl date"> 
+            <span>{{talk.create_time | str2date | date2ymd}} {{ talk.create_time | str2date | date2hm}}</span>
+           </div> 
+           <div class="fr remark"> 
+
+           </div>
+          </div> 
+         </div> 
+         <div class="clearfix"></div> </li> 
+
+
+       </ul>        
+      </div> 
+     </div> 
+     <!-- <script>
+    $(function () {
+        $(".zan").click(function () {
+            $(this).children(".fa").toggleClass("color");
+            var c = parseInt($(this).parent().siblings(".zannum").html());
+            c = c++;
+        });
+        $(".star").click(function () {
+            console.log("eeee");
+            $(this).children(".fa").removeClass("fa-star-o").addClass("fa-star color");
+        });
+        $(".detail-list").unbind("scroll").bind("scroll", function (e) {
+            var sum = this.scrollHeight;
+            if (sum - 10 <= $(this).scrollTop() + $(this).height()) {
+                $(".detail-list").append($("li").clone());
+            }
+        });
+    })
+
+</script> --> 
+    </div> 
+    <div class="fl right-tag"> 
+     <div class="block-btn"> 
+      <p>来个匿名吐槽，发泄一下你心中的怒火吧！</p> 
+      <a class="sui-btn btn-block btn-share" href="./talk-submit.html" >发吐槽</a>
+     </div> 
+    </div> 
+    <div class="clearfix"></div> 
+   </div> 
+  </div> 
+  <div class="footer"> 
+
+  </div> 
+
+ </body>
+</html>
+<script type="text/javascript" src="js/base.js"></script>
+<script src="js/talk_index.js"></script>
